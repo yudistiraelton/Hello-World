@@ -1,0 +1,101 @@
+---
+title: "UTS V || DMKM"
+author: "221810670 - Yudistira Elton Jhon - 3SI2"
+date: "10/27/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+
+### Baca Data dan siapkan library
+Data tersimpan di folder `UTS`
+
+```{r setup, include=FALSE}
+library(caret)
+library(neuralnet)
+library(nnet)
+diagnosis <- read.csv2("D:/Polstat STIS/Tingkat 3/Semester 5/DMKM/UTS/diagnosis.csv", header=FALSE)
+colnames(diagnosis) <- c("a1","a2","a3","a4","a5","a6", "d1", "d2")
+str(diagnosis)
+```
+
+# Prerocessing data
+
+Ubah tipe variabel menjadi tipe faktor
+```{r}
+diagnosis$a2<-as.factor(diagnosis$a2)
+diagnosis$a3=as.factor(diagnosis$a3)
+diagnosis$a4=as.factor(diagnosis$a4)
+diagnosis$a5=as.factor(diagnosis$a5)
+diagnosis$a6=as.factor(diagnosis$a6)
+diagnosis$d1=as.factor(diagnosis$d1)
+diagnosis$d2=as.factor(diagnosis$d2)
+str(diagnosis)
+```
+
+cek dan handle missing value
+```{r}
+library(dplyr)
+data <- na_if(diagnosis, "?")
+sapply(data, function(x) sum(is.na(x)))
+library(visdat)
+vis_miss(data)
+
+```
+
+terlihat pada visualisasi cek missing data, terdapat data tidak ada missing value, sehingga data bisa dimodelkan dengan neural network.
+
+
+### Split Data
+Memecah data menjadi data training (80% dari data awal) dan data test (20% dari data awal)
+```{r}
+set.seed(111)
+sampel <- sample(2,nrow(diagnosis),replace = T, prob = c(0.8,0.2))
+trainingdat <- diagnosis[sampel==1, ]
+testingdat <- diagnosis[sampel==2, ]
+```
+
+Setelah memecah data menjadi data training (80% dari data awal) dan data test (20% dari data awal), didapat :
+```{r}
+print(paste("Jumlah train data :", nrow(trainingdat), "|| Jumlah test data :", nrow(testingdat)))
+```
+
+
+### Membuat Model
+
+menggunakan semua atributnya
+```{r}
+set.seed(223)
+#model dengan 1 hidden layer dan hidden node
+m <- model.matrix( 
+  ~ d2+a1+a2+a3+a4+a5+a6, 
+  data = diagnosis 
+)
+model1<-neuralnet(d2yes~a1+a2yes+a3yes+a4yes+a5yes+a6yes, data=m,
+                  hidden = 1,
+                   err.fct = "ce",
+                   linear.output = F)
+plot(model1)
+```
+Pada plot neural network diatas ,diketahui nilai error nya yaitu sebesar 0.01903, dan steps nya di dapatkan mesin telah melakukan 180 kali iterasi.
+
+
+### Prediksi
+
+jika output dari model lebih dari 0.5, maka kategorikan sebagai 1 (admitted), dan 0 (non admitted) jika lainnya
+
+```{r}
+# 1 hidden layer dan hidden node
+
+
+```
+
+
+### Evaluasi Model
+
+#### 1 hidden layer dan hidden node
+```{r}
+
+```
+
